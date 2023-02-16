@@ -14,10 +14,10 @@ class Encoder:
     def writetoenc(self, num):
         formed = f"{num:04b}"
 
-        self.A.value(formed[0])
-        self.B.value(formed[1])
-        self.C.value(formed[2])
-        self.D.value(formed[3])
+        self.A.value(formed[3])
+        self.B.value(formed[2])
+        self.C.value(formed[1])
+        self.D.value(formed[0])
 
     def select(self, seg):
         if seg == 1:
