@@ -1,5 +1,15 @@
 import tkinter as tk
 import serial
+from seven import Digit
+
+def convert_to_double_digit(number):
+    num_digits = len(str(number))
+    if num_digits == 1:
+        return "0"+str(number)
+    elif num_digits == 2:
+        return str(number)
+    elif num_digits == 3:
+        return str(round(float(number)/100, 1))
 
 class App(tk.Tk):
     def __init__(self, com_port):
@@ -22,7 +32,7 @@ class App(tk.Tk):
         self.resizable(False, False)
 
         # Taille de la fenêtre
-        self.geometry("350x125")
+        self.geometry("350x200")
 
         # Texte dessus
         self.label_distance = tk.Label(self, text="Indiquez la distance voulue", font=("Arial", 13))
@@ -40,8 +50,17 @@ class App(tk.Tk):
         self.button.config(command=self.send)
 
         # Texte du dessous
-        self.distance_label = tk.Label(self, text="Vous êtes à une distance inconnue", font=("Arial", 13))
-        self.distance_label.place(x=8, y=70, width=275, height=30)
+        self.label_segments = tk.Label(self, text="Affichage:", font=("Arial", 13))
+        self.label_segments.place(x=10, y=95, width=100, height=30)
+        self.seg_canvas1 = tk.Canvas(self)
+        self.seg_canvas1.place(x=100, y=80, width=40, height=80)
+        # self.dig1 = Digit(self.seg_canvas1)
+        # self.dot_canvas = tk.Canvas(self)
+        # self.dot_canvas.place(x=140, y=80, width=10, height=80)
+        # self.dot_canvas.create_rectangle(0, 50, 10, 60, fill="#c3c3c3")
+        self.seg_canvas2 = tk.Canvas(self)
+        self.seg_canvas2.place(x=140, y=80, width=40, height=80)
+        self.dig2 = Digit(self.seg_canvas2)
 
         # Cercle rouge
         self.canvas = tk.Canvas(self)
@@ -76,7 +95,9 @@ class App(tk.Tk):
 
     def update_display(self):
         data = self.read_serial()
-        self.distance_label.config(text="Vous êtes à une distance de "+str(data)+" cm")
+        digits = convert_to_double_digit(data)
+        self.dig1.show(int(digits[0]))
+        self.dig2.show(int(digits[-1]))
         self.update_led_display(data)
         self.after(100, self.update_display)
 
