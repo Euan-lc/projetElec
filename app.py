@@ -5,7 +5,7 @@ class App(tk.Tk):
     def __init__(self, com_port):
         super().__init__()
 
-        self.led_max_distance = 0
+        self.led_max_distance = 20
 
         self.serial_connection = serial.Serial(
             port=com_port,
@@ -82,10 +82,10 @@ class App(tk.Tk):
 
     def update_led_display(self, distance):
         if distance > self.led_max_distance:
-            self.canvas.itemconfig(self.green_circle, fill="#BDFCC9")
+            self.canvas2.itemconfig(self.green_circle, fill="#BDFCC9")
             self.canvas.itemconfig(self.red_circle, fill="red")
         else:
-            self.canvas.itemconfig(self.green_circle, fill="green")
+            self.canvas2.itemconfig(self.green_circle, fill="green")
             self.canvas.itemconfig(self.red_circle, fill="#FFC0CB")
 
 
