@@ -1,36 +1,47 @@
-from encoder import Encoder
+from machine import Pin, Timer
+import time
 from hcsr04 import HCSR04
+import sys
+import select
+from encoder import Encoder
 
-a = 12
-b = 13
-c = 14
-d = 15
+time.sleep(1)
+greenLed = Pin(12, Pin.OUT)
+redLed = Pin(13, Pin.OUT)
 
-seg1 = 16
-seg2 = 17
+greenLed.value(1)
+redLed.value(0)
 
-seg1_value = 0
-seg2_value = 0
+enc = Encoder(21, 18, 19, 20)
 
-trig = 18
-echo = 1
+poll_object = select.poll()
+poll_object.register(sys.stdin, 1)
 
-enc = Encoder(a, b, c, d, seg1, seg2)
-sens = HCSR04(trig, echo)
+hc = HCSR04(16, 17)
+
+distance = 0
+maximum = 20
+
+tim = Timer()
+
+def tick(timer):
+    global maximum
+    
+    distance = hc.distance_cm()
+    if (int(distance) > int(maximum)):
+        greenLed.value(0)
+        redLed.value(1)
+    else:
+        greenLed.value(1)
+        redLed.value(0)
+
+    print(distance)
+    enc.writetoenc(int(str(distance)[-1]))
+
+tim.init(period=200, callback=tick)
 
 while True:
-    distance = sens.distance_cm()
-    if distance > 99:
-        seg1_value = f'{distance:02d}'[0]
-        seg2_value = f'{distance:02d}'[1]
-
-    elif 99 < distance < 1000:
-        seg1_value = f'{distance:.1f}'[0]
-        seg2_value = f'{distance:.1f}'[1]
-    else:
-        print('uh oh poopy')
-
-    enc.select(1)
-    enc.writetoenc(seg1_value)
-    enc.select(2)
-    enc.writetoenc(seg2_value)
+    if poll_object.poll(0):
+        line = sys.stdin.buffer.readline()
+        stripped = line.strip()
+        maximum = int(stripped)
