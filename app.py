@@ -15,8 +15,6 @@ class App(tk.Tk):
             stopbits=serial.STOPBITS_ONE
         )
 
-
-
         self.label = tk.Label(self, font=("Arial", 20), fg="blue")
         self.title("App Proj Elec")
 
@@ -55,7 +53,7 @@ class App(tk.Tk):
         self.green_circle = self.canvas2.create_oval(10, 10, 50, 50, fill="#BDFCC9")
         self.canvas2.place(x=290, y=10, width=60, height=60)
 
-        #self.after(0, self.update_display)
+        self.after(0, self.update_display)
         self.mainloop()
 
     def valider_entree(self, action, valeur_entree):
