@@ -8,15 +8,13 @@ from picozero import Pot
 
 greenLed = Pin(12, Pin.OUT)
 redLed = Pin(13, Pin.OUT)
-setButton = Pin(7, Pin.IN)
+setButton = Pin(11, Pin.IN)
 potentiometer = Pot(0)
 segOff = Pin(15, Pin.OUT)
-
 greenLed.value(1)
 redLed.value(0)
 
-
-enc = Encoder(21, 18, 19, 20)
+enc = Encoder(21, 18, 19, 20, 9, 22)
 
 poll_object = select.poll()
 poll_object.register(sys.stdin, 1)
@@ -25,33 +23,30 @@ hc = HCSR04(16, 17)
 
 distance = 0
 maximum = 20
-
+toDisplay = 14
 flickerBool = False
-measureTimerSwitch = True
+measureSwitch = True
 measureTimer = Timer()
+
 
 def measureDistance(timer):
     global maximum
-    global measureTimerSwitch
     global flickerBool
-    if measureTimerSwitch:
-        segOff.value(True)
-        distance = hc.distance_cm()
-        if (int(distance) > int(maximum)):
+    global toDisplay
+    global measureSwitch
+
+    if measureSwitch:
+        if (int(toDisplay) > int(maximum)):
             greenLed.value(0)
             redLed.value(1)
         else:
             greenLed.value(1)
             redLed.value(0)
-        print(distance)
-        enc.writetoenc(int(str(distance)[-1]))
     else:
-        potValue = int(translate(potentiometer.value, 0.06, 1, 2, 200))
-        print(potValue)
-        maximum=potValue
-        enc.writetoenc(int(str(potValue)[-1]))
-        segOff.value(flickerBool)
-        flickerBool = not flickerBool
+        greenLed.value(1)
+        redLed.value(1)
+    enc.write_double(toDisplay)
+
 
 def translate(value, leftMin, leftMax, rightMin, rightMax):
     # Figure out how 'wide' each range is
@@ -64,15 +59,24 @@ def translate(value, leftMin, leftMax, rightMin, rightMax):
     # Convert the 0-1 range into a value in the right range.
     return rightMin + (valueScaled * rightSpan)
 
-measureTimer.init(period=200, callback=measureDistance)
+
+measureTimer.init(period=25, callback=measureDistance)
 
 while True:
+    time.sleep(0.2)
     if poll_object.poll(0):
         line = sys.stdin.buffer.readline()
         stripped = line.strip()
         maximum = int(stripped)
     if setButton.value():
         time.sleep(0.5)
-        measureTimerSwitch = not measureTimerSwitch
+        if not measureSwitch:
+            maximum = int(translate(potentiometer.value, 0.025, 0.97, 2, 200))
+        measureSwitch = not measureSwitch
         time.sleep(0.5)
+    if measureSwitch:
+        toDisplay = hc.distance_cm()
+    else:
+        toDisplay = int(translate(potentiometer.value, 0.025, 0.97, 2, 200))
+    print(("H" if measureSwitch else "M") + str(toDisplay))
 

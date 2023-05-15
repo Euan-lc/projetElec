@@ -54,7 +54,7 @@ class App(tk.Tk):
         self.label_segments.place(x=10, y=95, width=100, height=30)
         self.seg_canvas1 = tk.Canvas(self)
         self.seg_canvas1.place(x=100, y=80, width=40, height=80)
-        # self.dig1 = Digit(self.seg_canvas1)
+        self.dig1 = Digit(self.seg_canvas1)
         # self.dot_canvas = tk.Canvas(self)
         # self.dot_canvas.place(x=140, y=80, width=10, height=80)
         # self.dot_canvas.create_rectangle(0, 50, 10, 60, fill="#c3c3c3")
@@ -87,9 +87,14 @@ class App(tk.Tk):
         self.serial_connection.write(str.encode(str(self.led_max_distance) + "\r\n"))
 
     def read_serial(self):
-        data = self.serial_connection.readline()
+        data = self.serial_connection.readline().strip().decode()
+        print(data)
         try:
-            return int(data.strip())
+            if data[0] == "H":
+                return int(data[1:])
+            else:
+                self.led_max_distance = int(data[1:])
+                return int(data[1:])
         except ValueError:
             return 0
 
