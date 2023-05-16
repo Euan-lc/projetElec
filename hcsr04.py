@@ -1,5 +1,5 @@
-import machine, time
-from machine import Pin
+import time
+from machine import Pin, time_pulse_us
 
 class HCSR04:
     def __init__(self, trig_pin, echo_pin, echo_timeout=25000):
@@ -14,8 +14,7 @@ class HCSR04:
         self.trig.value(1)
         time.sleep_us(2)
         self.trig.value(0)
-        pulse_duration = machine.time_pulse_us(self.echo, 1, 25000)
+        pulse_duration = time_pulse_us(self.echo, 1, 25000)
         distance = pulse_duration * 17165 / 1000000
         distance = round(distance, 0)
         return int(distance)
-    #'Distance:'+"{:.0f}".format(distance)+'cm'
