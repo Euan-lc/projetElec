@@ -26,20 +26,22 @@ maximum = 20
 toDisplay = 14
 flickerBool = False
 measureSwitch = True
-measureTimer = Timer()
+displayTimer = Timer()
 
 
-def measureDistance(timer):
+def displayTick(timer):
     global maximum
-    global flickerBool
     global toDisplay
     global measureSwitch
+    i = 0
 
     if measureSwitch:
         if (int(toDisplay) > int(maximum)):
             greenLed.value(0)
             redLed.value(1)
         else:
+            i += 1
+            print(timer)
             greenLed.value(1)
             redLed.value(0)
     else:
@@ -60,7 +62,7 @@ def translate(value, leftMin, leftMax, rightMin, rightMax):
     return rightMin + (valueScaled * rightSpan)
 
 
-measureTimer.init(period=25, callback=measureDistance)
+displayTimer.init(period=25, callback=displayTick)
 
 while True:
     time.sleep(0.2)
@@ -79,4 +81,3 @@ while True:
     else:
         toDisplay = int(translate(potentiometer.value, 0.025, 0.97, 2, 200))
     print(("H" if measureSwitch else "M") + str(toDisplay))
-

@@ -117,4 +117,3 @@ class App(tk.Tk):
 
 if __name__ == "__main__":
     app = App('COM10')
-    app.mainloop()
