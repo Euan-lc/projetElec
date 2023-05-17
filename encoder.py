@@ -12,7 +12,7 @@ class Encoder:
         self.segOne = Pin(seg1, Pin.OUT)
         self.segTwo = Pin(seg2, Pin.OUT)
 
-    def writetoenc(self, num):
+    def write_to_enc(self, num):
         formed = f"{int(num):04b}"
 
         self.A.value(int(formed[3]))
@@ -41,8 +41,8 @@ class Encoder:
     def write_double(self, num):
         digit_str = self.convert_to_double_digit(num)
         self.select(1)
-        self.writetoenc(digit_str[-1])
+        self.write_to_enc(digit_str[-1])
         sleep(0.01)
         self.select(2)
-        self.writetoenc(digit_str[0])
+        self.write_to_enc(digit_str[0])
         sleep(0.01)
